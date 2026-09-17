@@ -1,16 +1,38 @@
 import nodemailer from "nodemailer";
 
-// PRODUCTION READY: App Password configured in .env
-const SEND_REAL_EMAILS = true;
+// Create the transporter lazily. ES module imports are evaluated before
+// server.js calls dotenv.config(), so constructing it at module load time can
+// capture undefined credentials even when backend/.env is configured.
+function createEmailTransporter() {
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+}
 
-// Configure email transporter (using Gmail with App Password)
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
-  },
-});
+export const verifyEmailConnection = async () => {
+  if (!process.env.EMAIL_USER?.trim() || !process.env.EMAIL_PASSWORD?.trim()) {
+    return {
+      ok: false,
+      skipped: true,
+      message: "EMAIL_USER/EMAIL_PASSWORD are not configured.",
+    };
+  }
+
+  try {
+    await createEmailTransporter().verify();
+    return { ok: true, skipped: false, message: "SMTP authentication succeeded." };
+  } catch (err) {
+    return {
+      ok: false,
+      skipped: false,
+      message: err?.message || "SMTP authentication failed.",
+    };
+  }
+};
 
 function getAppBaseUrl() {
   if (process.env.APP_BASE_URL) return process.env.APP_BASE_URL;
@@ -20,6 +42,11 @@ function getAppBaseUrl() {
 }
 
 export const sendRegistrationReceivedEmail = async (orgName, email) => {
+  if (!process.env.EMAIL_USER?.trim() || !process.env.EMAIL_PASSWORD?.trim()) {
+    console.warn("Email skipped: EMAIL_USER/EMAIL_PASSWORD are not configured.");
+    return { sent: false, skipped: true };
+  }
+
   try {
     const baseUrl = getAppBaseUrl();
 
@@ -56,15 +83,21 @@ export const sendRegistrationReceivedEmail = async (orgName, email) => {
       `,
     };
 
-    await transporter.sendMail(mailOptions);
+    await createEmailTransporter().sendMail(mailOptions);
     console.log(`✅ Registration received email sent to ${email}`);
+    return { sent: true, skipped: false };
   } catch (err) {
     console.error("Error sending registration received email:", err);
-    throw err;
+    return { sent: false, skipped: false, error: err.message };
   }
 };
 
 export const sendApprovalEmail = async (orgName, email) => {
+  if (!process.env.EMAIL_USER?.trim() || !process.env.EMAIL_PASSWORD?.trim()) {
+    console.warn("Email skipped: EMAIL_USER/EMAIL_PASSWORD are not configured.");
+    return { sent: false, skipped: true };
+  }
+
   try {
     const baseUrl = getAppBaseUrl();
 
@@ -101,15 +134,21 @@ export const sendApprovalEmail = async (orgName, email) => {
       `,
     };
 
-    await transporter.sendMail(mailOptions);
+    await createEmailTransporter().sendMail(mailOptions);
     console.log(`✅ Approval email sent to ${email}`);
+    return { sent: true, skipped: false };
   } catch (err) {
     console.error("Error sending approval email:", err);
-    throw err;
+    return { sent: false, skipped: false, error: err.message };
   }
 };
 
 export const sendRejectionEmail = async (orgName, email) => {
+  if (!process.env.EMAIL_USER?.trim() || !process.env.EMAIL_PASSWORD?.trim()) {
+    console.warn("Email skipped: EMAIL_USER/EMAIL_PASSWORD are not configured.");
+    return { sent: false, skipped: true };
+  }
+
   try {
     const mailOptions = {
       from: process.env.EMAIL_USER || "slumlink@gmail.com",
@@ -149,10 +188,11 @@ export const sendRejectionEmail = async (orgName, email) => {
       `,
     };
 
-    await transporter.sendMail(mailOptions);
+    await createEmailTransporter().sendMail(mailOptions);
     console.log(`✅ Rejection email sent to ${email}`);
+    return { sent: true, skipped: false };
   } catch (err) {
     console.error("Error sending rejection email:", err);
-    throw err;
+    return { sent: false, skipped: false, error: err.message };
   }
 };

@@ -10,8 +10,10 @@
     "server": "node backend/server.js",
     "prestart": "node scripts/free-port.js",
     "start": "node backend/server.js",
+    "db:seed": "node scripts/seed-demo.js",
     "db:verify": "node backend/setupDatabase.js",
-    "test:postgres": "node scripts/verify-postgres-compat.js"
+    "test:postgres": "node scripts/verify-postgres-compat.js",
+    "test:notifications": "node scripts/test-notifications.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.116.0",

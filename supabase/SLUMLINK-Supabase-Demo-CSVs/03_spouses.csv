@@ -1,0 +1,12 @@
+id,slum_id,name,dob,gender,nid,education,job,income,mobile,status,skills_1,skills_2
+900001,SR900001,Shirin Akter,1989-07-02,Female,99800000000000001,Class 7,Home-based Worker,7000,01900800001,active,Sewing,Cooking
+900002,SR900003,Jahanara Begum,1983-12-18,Female,99800000000000002,Primary,Homemaker,0,01900800002,active,Cooking,Poultry Rearing
+900003,SR900004,Azizul Haque,1984-05-09,Male,99800000000000003,Class 8,Mechanic Helper,15500,01900800003,active,Mechanical Repair,Driving
+900004,SR900005,Rehana Begum,1986-01-20,Female,99800000000000004,Class 5,Homemaker,0,01900800004,active,Cooking,Sewing
+900005,SR900007,Kulsum Akter,1985-08-08,Female,99800000000000005,Primary,Domestic Worker,8500,01900800005,active,Cleaning,Cooking
+900006,SR900008,Shahidul Islam,1986-03-14,Male,99800000000000006,Class 8,Security Guard,14500,01900800006,active,Security,Driving
+900007,SR900009,Tania Akter,1998-09-06,Female,99800000000000007,SSC,Garment Worker,15000,01900800007,active,Garment Sewing,Quality Checking
+900008,SR900011,Monowara Begum,1988-10-22,Female,99800000000000008,Class 6,Homemaker,0,01900800008,active,Cooking,Handicrafts
+900009,SR900012,Rubel Hossain,1990-04-17,Male,99800000000000009,SSC,Bus Helper,15000,01900800009,active,Driving,Vehicle Cleaning
+900010,SR900013,Amena Khatun,1991-06-12,Female,99800000000000010,Class 8,Tailor,11000,01900800010,active,Sewing,Embroidery
+900011,SR900014,Masud Rana,1988-11-29,Male,99800000000000011,Class 9,Restaurant Worker,16000,01900800011,pending_add,Cooking,Customer Service

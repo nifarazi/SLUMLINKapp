@@ -1,0 +1,7 @@
+org_id,org_type,org_name,email,phone,org_age,password,status,license_filename,license_mimetype,license_size,license_file
+900001,ngo,Alor Pothe Foundation,contact@alorpoth-demo.example,01900910001,12,NgoDemo@123,accepted,demo-license.txt,text/plain,31,\x53796e746865746963206c6963656e7365202d206e6f742076616c6964
+900002,ngo,Nabodisha Community Trust,hello@nabodisha-demo.example,01900910002,8,NgoDemo@123,accepted,demo-license.txt,text/plain,31,\x53796e746865746963206c6963656e7365202d206e6f742076616c6964
+900003,ngo,Shobuj Shathi Initiative,office@shobuj-demo.example,01900910003,6,NgoDemo@123,accepted,demo-license.txt,text/plain,31,\x53796e746865746963206c6963656e7365202d206e6f742076616c6964
+900004,localauthority,Dhaka North Community Support Cell,support@dncc-demo.example,01900910004,15,AuthorityDemo@123,accepted,demo-authorization.txt,text/plain,37,\x53796e74686574696320617574686f72697a6174696f6e202d206e6f742076616c6964
+900005,ngo,Uttoron Welfare Network,apply@uttoron-demo.example,01900910005,3,NgoDemo@123,pending,demo-license.txt,text/plain,31,\x53796e746865746963206c6963656e7365202d206e6f742076616c6964
+900006,ngo,Prottasha Aid Society,info@prottasha-demo.example,01900910006,4,NgoDemo@123,suspended,demo-license.txt,text/plain,31,\x53796e746865746963206c6963656e7365202d206e6f742076616c6964

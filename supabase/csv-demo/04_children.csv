@@ -1,0 +1,19 @@
+id,slum_id,name,dob,gender,education,job,income,preferred_job,birth_certificate_number,age_group,status,skills_1,skills_2
+900001,SR900001,Sadia Rahman,2011-03-11,Female,Class 8,,0,Teacher,DEMO-BC-900001,child,active,Drawing,Reading
+900002,SR900001,Rifat Rahman,2016-08-24,Male,Class 3,,0,Engineer,DEMO-BC-900002,child,active,Sports,Math
+900003,SR900002,Mim Akter,2014-01-15,Female,Class 5,,0,Nurse,DEMO-BC-900003,child,active,Reading,Singing
+900004,SR900003,Sujon Hossain,2005-07-19,Male,Class 10,Apprentice,6000,Electrician,DEMO-BC-900004,adult,active,Electrical Repair,Cycling
+900005,SR900003,Jannat Hossain,2010-10-04,Female,Class 9,,0,Teacher,DEMO-BC-900005,child,active,Reading,Computer Basics
+900006,SR900004,Sumaiya Haque,2012-09-09,Female,Class 7,,0,Doctor,DEMO-BC-900006,child,active,Science,Reading
+900007,SR900004,Sakib Haque,2018-02-13,Male,Class 1,,0,Police Officer,DEMO-BC-900007,child,active,Sports,Drawing
+900008,SR900005,Arif Mia,2007-12-01,Male,Class 9,Shop Assistant,5000,Business Owner,DEMO-BC-900008,adult,active,Sales,Smartphone Use
+900009,SR900005,Runa Akter,2013-06-16,Female,Class 6,,0,Nurse,DEMO-BC-900009,child,active,Reading,Sewing
+900010,SR900006,Nusrat Jahan,2015-11-30,Female,Class 4,,0,Teacher,DEMO-BC-900010,child,active,Drawing,Reading
+900011,SR900007,Shanto Sheikh,2006-04-23,Male,Class 8,Day Labourer,6500,Mechanic,DEMO-BC-900011,adult,active,Mechanical Repair,Cycling
+900012,SR900007,Rima Akter,2009-08-05,Female,Class 10,,0,Garment Supervisor,DEMO-BC-900012,child,active,Sewing,Computer Basics
+900013,SR900008,Rasel Islam,2010-03-26,Male,Class 9,,0,Technician,DEMO-BC-900013,child,active,Electrical Repair,Sports
+900014,SR900010,Taslima Akter,2004-10-10,Female,HSC,Tailoring Assistant,7000,Tailor,DEMO-BC-900014,adult,active,Sewing,Embroidery
+900015,SR900011,Mahin Karim,2012-01-07,Male,Class 7,,0,Engineer,DEMO-BC-900015,child,active,Math,Computer Basics
+900016,SR900012,Lamisa Sultana,2016-04-21,Female,Class 3,,0,Doctor,DEMO-BC-900016,child,pending_add,Reading,Drawing
+900017,SR900013,Fahim Islam,2008-06-28,Male,Class 10,,0,Driver,DEMO-BC-900017,adult,active,Driving,Smartphone Use
+900018,SR900014,Anika Akter,2013-02-14,Female,Class 6,,0,Chef,DEMO-BC-900018,child,active,Cooking,Drawing

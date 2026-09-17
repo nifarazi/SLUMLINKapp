@@ -1,0 +1,19 @@
+notification_id,slum_code,campaign_id,org_id,type,title,message,is_read,created_at
+900001,SR900001,900001,900001,campaign_created,New campaign matched your household,Your household matched: Monsoon Family Food Support.,true,2026-07-26 10:05+06
+900002,SR900002,900001,900001,campaign_created,New campaign matched your household,Your household matched: Monsoon Family Food Support.,true,2026-07-26 10:05+06
+900003,SR900005,900002,900002,campaign_created,New campaign matched your household,Your household matched: Women Tailoring and Enterprise Workshop.,false,2026-08-29 11:35+06
+900004,SR900006,900002,900002,campaign_created,New campaign matched your household,Your household matched: Women Tailoring and Enterprise Workshop.,false,2026-08-29 11:35+06
+900005,SR900007,900003,900003,campaign_created,New campaign matched your household,Your household matched: Child Wellness and Nutrition Camp.,false,2026-09-03 09:25+06
+900006,SR900008,900003,900003,campaign_created,New campaign matched your household,Your household matched: Child Wellness and Nutrition Camp.,false,2026-09-03 09:25+06
+900007,SR900003,900004,900004,campaign_created,New campaign matched your household,Your household matched: Community Drainage Response Drive.,false,2026-09-08 15:50+06
+900008,SR900004,900004,900004,campaign_created,New campaign matched your household,Your household matched: Community Drainage Response Drive.,false,2026-09-08 15:50+06
+900009,SR900011,900005,900001,campaign_created,New campaign matched your household,Your household matched: Digital Basics for Youth.,false,2026-09-10 10:20+06
+900010,SR900012,900005,900001,campaign_created,New campaign matched your household,Your household matched: Digital Basics for Youth.,false,2026-09-10 10:20+06
+900011,SR900013,900006,900002,campaign_created,New campaign matched your household,Your household matched: Winter Clothing Preparation.,false,2026-09-11 14:05+06
+900012,SR900014,900006,900002,campaign_created,New campaign matched your household,Your household matched: Winter Clothing Preparation.,false,2026-09-11 14:05+06
+900013,SR900009,900007,900003,campaign_created,New campaign matched your household,Your household matched: Safe Water Awareness Session.,true,2026-08-08 12:35+06
+900014,SR900010,900007,900003,campaign_created,New campaign matched your household,Your household matched: Safe Water Awareness Session.,true,2026-08-08 12:35+06
+900015,SR900001,900008,900001,campaign_cancelled,Campaign cancelled,Emergency Heat Relief Point has been cancelled.,false,2026-07-09 16:25+06
+900016,SR900002,900008,900001,campaign_cancelled,Campaign cancelled,Emergency Heat Relief Point has been cancelled.,false,2026-07-09 16:25+06
+900017,SR900007,900009,900002,campaign_created,New campaign matched your household,Your household matched: Mobile Job Matching Desk.,false,2026-08-16 09:45+06
+900018,SR900008,900009,900002,campaign_created,New campaign matched your household,Your household matched: Mobile Job Matching Desk.,false,2026-08-16 09:45+06

@@ -252,7 +252,7 @@ export const approveNGO = async (req, res) => {
 
     return res.json({
       status: "success",
-      message: `${ngo[0].org_name} has been approved successfully. Email sent to ${ngo[0].email}`,
+      message: `${ngo[0].org_name} has been approved successfully.`,
     });
   } catch (err) {
     console.error("Approve NGO Error:", err);
@@ -304,7 +304,7 @@ export const rejectNGO = async (req, res) => {
 
     return res.json({
       status: "success",
-      message: `${ngo[0].org_name} has been rejected. Email sent to ${ngo[0].email}`,
+      message: `${ngo[0].org_name} has been rejected.`,
     });
   } catch (err) {
     console.error("Reject NGO Error:", err);

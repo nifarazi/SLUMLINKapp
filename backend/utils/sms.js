@@ -1,6 +1,58 @@
 // SMS utility functions using BulkSMSBD API
 import fetch from 'node-fetch';
 
+const SMS_API_BASE_URL = 'https://bulksmsbd.net/api';
+
+function getProviderCode(responseText) {
+  try {
+    const parsed = JSON.parse(responseText);
+    const code = parsed.response_code ?? parsed.code ?? parsed.status_code ?? parsed.status;
+    return code == null ? null : String(code);
+  } catch (_) {
+    const match = String(responseText).match(/(?:response[_ ]?code|code|status)[^0-9]*(\d{3,4})/i)
+      || String(responseText).match(/^\s*(\d{3,4})\b/);
+    return match ? match[1] : null;
+  }
+}
+
+export async function checkSMSBalance() {
+  const apiKey = process.env.BULKSMS_API_KEY?.trim();
+  if (!apiKey) {
+    return { ok: false, skipped: true, message: 'BULKSMS_API_KEY is not configured.' };
+  }
+
+  try {
+    const url = `${SMS_API_BASE_URL}/getBalanceApi?api_key=${encodeURIComponent(apiKey)}`;
+    const response = await fetch(url, { method: 'GET' });
+    const responseText = (await response.text()).trim();
+    const providerCode = getProviderCode(responseText);
+    const knownErrorCode = providerCode && providerCode !== '202';
+
+    if (!response.ok || knownErrorCode || !responseText) {
+      return {
+        ok: false,
+        skipped: false,
+        status: response.status,
+        providerCode,
+        message: responseText || response.statusText || 'Empty provider response.',
+      };
+    }
+
+    return {
+      ok: true,
+      skipped: false,
+      status: response.status,
+      message: 'BulkSMSBD credentials were accepted by the balance endpoint.',
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      skipped: false,
+      message: error?.message || 'BulkSMSBD connection failed.',
+    };
+  }
+}
+
 export async function sendSMS(number, message) {
   try {
     // Using the same API as found in the signup process
@@ -12,20 +64,23 @@ export async function sendSMS(number, message) {
       return false;
     }
     
-    const url = `http://bulksmsbd.net/api/smsapi?api_key=${encodeURIComponent(apiKey)}&type=text&number=${encodeURIComponent(number)}&senderid=${encodeURIComponent(senderid)}&message=${encodeURIComponent(message)}`;
+    const url = `${SMS_API_BASE_URL}/smsapi?api_key=${encodeURIComponent(apiKey)}&type=text&number=${encodeURIComponent(number)}&senderid=${encodeURIComponent(senderid)}&message=${encodeURIComponent(message)}`;
     
     // Use GET method as per the existing implementation
     const response = await fetch(url, { method: 'GET' });
     const responseText = await response.text();
     
-    if (response.ok) {
+    const providerCode = getProviderCode(responseText);
+    if (response.ok && providerCode === '202') {
       console.log('📱 SMS sent successfully to:', number);
-      console.log('📱 SMS provider response:', responseText);
       return true;
     }
 
-    console.error('❌ SMS send failed:', response.status, response.statusText);
-    console.error('❌ SMS provider response:', responseText);
+    console.error('❌ SMS send failed:', {
+      httpStatus: response.status,
+      providerCode,
+      providerResponse: responseText,
+    });
     return false;
   } catch (error) {
     console.error('❌ SMS send error:', error);
