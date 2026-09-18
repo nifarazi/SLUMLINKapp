@@ -641,7 +641,10 @@
     // Open modal
     const modal = document.getElementById('otpModal');
     function openModal(){ modal.setAttribute('aria-hidden','false'); modal.classList.add('open'); }
-    function closeModal(){ modal.setAttribute('aria-hidden','true'); modal.classList.remove('open'); }
+    function closeModal(){
+      if (modal.contains(document.activeElement)) document.activeElement.blur();
+      modal.setAttribute('aria-hidden','true'); modal.classList.remove('open');
+    }
 
     makeInputsForNumbers(numbers);
     openModal();
@@ -727,10 +730,17 @@
           body: JSON.stringify({ personal, spouses, children })
         });
 
-        const result = await response.json();
-        
+        const raw = await response.text();
+        let result = null;
+        try { result = raw ? JSON.parse(raw) : null; } catch { result = null; }
+
+        if (!response.ok) {
+          throw new Error((result && result.message) || `Server error (${response.status}). Please try again.`);
+        }
+        if (!result) throw new Error('Server returned an empty response. Please try again.');
+
         console.log('Registration response:', result);
-        
+
         if (result.status === 'success') {
           // Store slum_code in session for reference
           try{ sessionStorage.setItem('slumId', result.slum_code); }catch{}

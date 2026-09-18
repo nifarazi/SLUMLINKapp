@@ -402,7 +402,7 @@ function extensionFromMime(mimeType) {
 }
 
 export const registerSlumDweller = async (req, res) => {
-  const connection = await pool.getConnection();
+  let connection = null;
 
   try {
     const { personal, spouses, children } = req.body;
@@ -433,6 +433,7 @@ export const registerSlumDweller = async (req, res) => {
       });
     }
 
+    connection = await pool.getConnection();
     await connection.beginTransaction();
 
     // Hash password
@@ -608,6 +609,8 @@ export const registerSlumDweller = async (req, res) => {
 
     console.log('✅ Registration successful:', { slum_code: slumCode, id: slumDwellerId });
 
+    connection = null;
+
     return res.json({
       status: "success",
       message: "Registration submitted successfully. Your application is pending approval.",
@@ -616,7 +619,13 @@ export const registerSlumDweller = async (req, res) => {
     });
 
   } catch (error) {
-    await connection.rollback();
+    if (connection) {
+      try {
+        await connection.rollback();
+      } catch (rollbackError) {
+        console.error('⚠️ Registration rollback failed:', rollbackError.message);
+      }
+    }
     console.error("❌ Registration error:", error);
     console.error("Error stack:", error.stack);
     return res.status(500).json({
@@ -625,7 +634,13 @@ export const registerSlumDweller = async (req, res) => {
       error: error.message
     });
   } finally {
-    connection.release();
+    if (connection) {
+      try {
+        connection.release();
+      } catch (releaseError) {
+        console.error('⚠️ Connection release failed:', releaseError.message);
+      }
+    }
   }
 };
 
