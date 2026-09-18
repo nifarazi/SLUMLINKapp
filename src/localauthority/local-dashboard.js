@@ -1,5 +1,6 @@
 const toastEl = document.getElementById("toast");
 let toastTimer;
+let currentOrgId = null;
 
 function toast(msg) {
   clearTimeout(toastTimer);
@@ -74,23 +75,117 @@ function renderRecent(list) {
       const date = fmtDate(x.finished_at || x.started_at);
 
       return `
-        <div class="aid-item clickable" data-toast="Session #${x.session_id} • ${families} families assisted">
+        <div class="aid-item clickable" data-session="${x.session_id}">
           <div class="aid-title">${title}</div>
-          <div class="aid-meta">${area} • ${families} families assisted</div>
+          <div class="aid-meta">${area} • ${families} famil${families === 1 ? "y" : "ies"} assisted — tap to view</div>
           <div class="aid-date">${date}</div>
         </div>
       `;
     })
     .join("");
 
-  // rebind toasts for newly rendered items
-  container.querySelectorAll("[data-toast]").forEach((el) => {
+  container.querySelectorAll("[data-session]").forEach((el) => {
     el.addEventListener("click", function (e) {
       e.preventDefault();
-      toast(this.getAttribute("data-toast"));
+      const sid = Number(this.getAttribute("data-session"));
+      const item = list.find((x) => Number(x.session_id) === sid);
+      if (item) showFamiliesModal(item);
     });
   });
 }
+
+function escapeHtml(text) {
+  const map = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" };
+  return String(text).replace(/[&<>"']/g, (m) => map[m]);
+}
+
+async function fetchSessionFamilies(sessionId) {
+  const res = await fetch(
+    `/api/dashboard/session/${encodeURIComponent(sessionId)}/families?org_id=${encodeURIComponent(currentOrgId)}`
+  );
+  const data = await safeJSON(res);
+  if (!res.ok) throw new Error(data?.message || "Failed to load families");
+  return data?.data || null;
+}
+
+function closeFamiliesModal() {
+  const modal = document.getElementById("familiesModal");
+  if (!modal) return;
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+}
+
+function showFamiliesModal(item) {
+  const modal = document.getElementById("familiesModal");
+  const bodyEl = document.getElementById("familiesModalBody");
+  const titleEl = document.getElementById("familiesModalTitle");
+
+  if (!modal || !bodyEl) {
+    toast(`Session #${item.session_id} • ${item.families_assisted} families assisted`);
+    return;
+  }
+
+  const label = item.campaign_title || "Campaign";
+  if (titleEl) titleEl.textContent = `${label} • Assisted Families`;
+  bodyEl.innerHTML = `<div class="families-loading">Loading family details...</div>`;
+
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+
+  fetchSessionFamilies(item.session_id)
+    .then((data) => {
+      if (!data) return;
+      const families = data.families || [];
+      const summary = data.session || {};
+      const famCount = families.length;
+      const aidType = summary.aid_type || "";
+
+      let html = `
+        <div class="families-modal-summary">
+          <span class="fms-chip">${famCount} famil${famCount === 1 ? "y" : "ies"} assisted</span>
+          ${aidType ? `<span class="fms-chip">${escapeHtml(aidType)}</span>` : ""}
+          ${summary.slum_area ? `<span class="fms-chip">${escapeHtml(summary.slum_area)}</span>` : ""}
+          <span class="fms-chip">${fmtDate(summary.finished_at || summary.started_at)}</span>
+        </div>
+      `;
+
+      if (!families.length) {
+        html += `<p class="families-empty">No family records for this session.</p>`;
+      } else {
+        html += `<div class="family-list">` + families.map((f) => `
+          <div class="family-card">
+            <div class="family-card-head">
+              <span class="family-code">${escapeHtml(f.slum_code || "—")}</span>
+              <span class="family-size">${f.family_members} member${f.family_members === 1 ? "" : "s"}</span>
+            </div>
+            <div class="family-name">${escapeHtml(f.family_head || "—")}</div>
+            <div class="family-details">
+              ${f.mobile ? `<span><i class="fas fa-phone" aria-hidden="true"></i> ${escapeHtml(f.mobile)}</span>` : ""}
+              ${f.area ? `<span><i class="fas fa-location-dot" aria-hidden="true"></i> ${escapeHtml(f.area)}</span>` : ""}
+              ${f.quantity ? `<span><i class="fas fa-gift" aria-hidden="true"></i> ${escapeHtml(aidType || "Aid")} × ${f.quantity}</span>` : ""}
+              ${f.comment ? `<span class="family-comment">${escapeHtml(f.comment)}</span>` : ""}
+            </div>
+          </div>
+        `).join("") + `</div>`;
+      }
+
+      bodyEl.innerHTML = html;
+    })
+    .catch((err) => {
+      console.error(err);
+      bodyEl.innerHTML = `<p class="families-empty">Failed to load family details.</p>`;
+    });
+}
+
+document.getElementById("familiesModalClose")?.addEventListener("click", closeFamiliesModal);
+document.getElementById("familiesModal")?.addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) closeFamiliesModal();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && document.getElementById("familiesModal")?.classList.contains("show")) closeFamiliesModal();
+});
 
 // Navigation (your existing)
 document.getElementById("qaAnalytics")?.addEventListener("click", (e) => {
@@ -159,6 +254,7 @@ confirmBtn?.addEventListener("click", () => {
 (async function initDashboard() {
   const session = readSession();
   const org_id = session?.org_id;
+  currentOrgId = org_id || null;
 
   if (!org_id) {
     toast("Session missing. Please sign in again.");
