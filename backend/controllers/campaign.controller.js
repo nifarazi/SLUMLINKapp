@@ -900,7 +900,7 @@ export async function getEligibleFamilies(req, res) {
     }
 
     sql += `
-      GROUP BY sd.slum_code, sd.full_name
+      GROUP BY sd.slum_code, sd.full_name, sd.family_members
       HAVING COUNT(*) > 0
       ORDER BY sd.slum_code ASC
     `;
