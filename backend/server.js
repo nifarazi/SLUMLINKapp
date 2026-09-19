@@ -18,6 +18,7 @@ import distributionRoutes from "./routes/distribution.routes.js";
 import aidTypeRoutes from "./routes/aidType.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
+import { failSafe } from "./utils/asyncHandler.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -54,24 +55,24 @@ app.get("/src/ngo/ngocreate-campaign.html", (req, res) => {
 app.use(express.static(rootDir));
 
 // ===== API Routes =====
-app.use("/api/ngo", ngoRoutes);
-app.use("/api/slum-dweller", slumDwellerRoutes);
-app.use("/api/documents", documentRoutes);
+app.use("/api/ngo", failSafe(ngoRoutes));
+app.use("/api/slum-dweller", failSafe(slumDwellerRoutes));
+app.use("/api/documents", failSafe(documentRoutes));
 
 // Old complaint routes
-app.use("/api/complaint", complaintRoutes);
+app.use("/api/complaint", failSafe(complaintRoutes));
 
 // New complaint counts & category routes
-app.use("/api/complaints", complaintCountRoutes);
+app.use("/api/complaints", failSafe(complaintCountRoutes));
 
 // Campaigns
-app.use("/api/campaigns", campaignRoutes);
+app.use("/api/campaigns", failSafe(campaignRoutes));
 
 // ✅ NEW API Routes
-app.use("/api", distributionRoutes); // /distribution-sessions + /distribution/families/:code/snapshot
-app.use("/api", aidTypeRoutes);      // /aid-types
-app.use("/api", notificationRoutes); // /notifications/:slumCode and related endpoints
-app.use("/api", dashboardRoutes);    // /dashboard/stats/:org_id
+app.use("/api", failSafe(distributionRoutes)); // /distribution-sessions + /distribution/families/:code/snapshot
+app.use("/api", failSafe(aidTypeRoutes));      // /aid-types
+app.use("/api", failSafe(notificationRoutes)); // /notifications/:slumCode and related endpoints
+app.use("/api", failSafe(dashboardRoutes));    // /dashboard/stats/:org_id
 
 // Health check
 app.get("/api/health", (req, res) => {
@@ -81,6 +82,45 @@ app.get("/api/health", (req, res) => {
 // Root page
 app.get("/", (req, res) => {
   res.sendFile(path.join(rootDir, "index.html"));
+});
+
+// 404 fallback for unmatched API routes (JSON, never HTML)
+app.use("/api", (req, res) => {
+  res.status(404).json({ status: "error", message: `Endpoint not found: ${req.method} ${req.originalUrl}` });
+});
+
+// ===== Central Error Handler =====
+// Converts any thrown/rejected error into a JSON response instead of a crash.
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  const isBodyParseError =
+    err &&
+    typeof err === "object" &&
+    (err.type === "entity.too.large" || err instanceof SyntaxError) &&
+    "body" in err;
+
+  let status = isBodyParseError ? 400 : 500;
+  let message = "Server error. Please try again.";
+
+  if (isBodyParseError) {
+    status = err.type === "entity.too.large" ? 413 : 400;
+    message = err.type === "entity.too.large"
+      ? "Request payload too large."
+      : "Invalid JSON payload.";
+  }
+
+  console.error("❌ Unhandled error:", err);
+  return res.status(status).json({ status: "error", message });
+});
+
+// ===== Process Safety Nets =====
+// Keep the instance alive and log instead of crashing (a crash surfaces to
+// clients as 502 Bad Gateway from Render's proxy).
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("⚠️ Unhandled promise rejection:", reason);
+});
+process.on("uncaughtException", (error) => {
+  console.error("⚠️ Uncaught exception:", error);
 });
 
 // ===== Server Start =====
